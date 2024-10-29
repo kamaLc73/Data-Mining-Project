@@ -11,11 +11,9 @@ import pandas as pd
 
 load_dotenv()
 
-# Function to sleep for a random time to mimic human behavior
 def random_sleep(min_time=1, max_time=3):
     time.sleep(random.uniform(min_time, max_time))
 
-# Setup Selenium WebDriver
 chrome_options = Options()
 chrome_options.add_argument("--start-maximized")
 chrome_options.add_argument("--disable-gpu")
@@ -28,9 +26,6 @@ chrome_options.add_argument("--log-level=3")
 chrome_options.add_experimental_option("excludeSwitches", ["enable-logging"])
 driver = webdriver.Chrome(options=chrome_options)
 
-
-
-# LinkedIn Login
 def linkedin_login():
     driver.get('https://www.linkedin.com/login')
     
@@ -51,76 +46,88 @@ def linkedin_login():
         print("Login failed or took too long.")
         driver.quit()
 
-# Search function to look up "laureat ensam rabat"
-def search_profiles(query):
-    search_url = f"https://www.linkedin.com/search/results/people/?keywords={query.replace(' ', '%20')}"
-    driver.get(search_url)
-    random_sleep(3, 5)
-    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, "reusable-search__result-container")))
-
-# Function to extract data from each LinkedIn profile
 def extract_data(profile_link):
     driver.get(profile_link)
     random_sleep(2, 4)
     
-    # Extract data elements
     try:
         name = driver.find_element(By.XPATH, "//h1").text
     except:
-        name = None
-
+        name = "N/A"
     try:
         degree = driver.find_element(By.XPATH, "//span[contains(text(),'Degree')]").text
     except:
-        degree = None
-
+        degree = "N/A"
     try:
         experience = driver.find_element(By.XPATH, "//section[contains(@class, 'experience-section')]").text
     except:
-        experience = None
-
+        experience = "N/A"
     try:
         skills = [skill.text for skill in driver.find_elements(By.XPATH, "//span[contains(@class, 'skill')]")]
     except:
-        skills = None
-
+        skills = []
     try:
         location = driver.find_element(By.XPATH, "//span[contains(@class, 'location')]").text
     except:
-        location = None
+        location = "N/A"
 
     profile_data = {
         'Name': name,
         'Degree': degree,
         'Experience': experience,
-        'Skills': ', '.join(skills) if skills else None,
+        'Skills': ', '.join(skills) if skills else "N/A",
         'Location': location,
         'Profile Link': profile_link
     }
 
-    print(f"Data extracted for profile: {name}")
+    print(f"Data extracted for profile: {profile_data}")
     return profile_data
 
-# Collect data for all profiles on the search page
+def search_profiles(query):
+    search_url = f"https://www.linkedin.com/search/results/people/?keywords={query.replace(' ', '%20')}"
+    driver.get(search_url)
+    random_sleep(3, 5)
+    
+    # Wait and ensure the search results have loaded
+    try:
+        WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, "reusable-search__result-container")))
+        print("Search results page loaded.")
+    except:
+        print("Failed to load search results page.")
+        return
+
+    # Print page source for debugging
+    print(driver.page_source)  # Debugging: to view the page HTML structure
+
 def collect_profiles():
     profiles_data = []
     
-    # Fetch links to profiles on the search result page
-    profile_links = driver.find_elements(By.XPATH, "//a[@class='app-aware-link']")
+    # Attempt to collect profile links with refined XPaths
+    profile_links = driver.find_elements(By.XPATH, "//a[contains(@href, '/in/')]")
     profile_urls = [link.get_attribute('href') for link in profile_links if 'linkedin.com/in/' in link.get_attribute('href')]
-    
+
+    print("Collected profile URLs:", profile_urls)  # Debugging: Check profile URLs
+
+    if not profile_urls:
+        print("No profile URLs found. Adjust XPath or check page structure.")
+        return
+
     for url in profile_urls:
-        profiles_data.append(extract_data(url))
+        profile_data = extract_data(url)
+        profiles_data.append(profile_data)
         random_sleep(1, 2)  # Mimic human behavior
 
-    # Save to Excel
-    df = pd.DataFrame(profiles_data)
-    df.to_excel("laureat_ensam_rabat_data.xlsx", index=False)
+    # Save to Excel if any profiles were processed
+    if profiles_data:
+        df = pd.DataFrame(profiles_data)
+        df.to_excel("laureat_ensam_rabat_data.xlsx", index=False)
+        print("Data saved successfully.")
+    else:
+        print("No profile data extracted.")
 
-# Execute the script
+# Execute updated functions
 linkedin_login()
 search_profiles("laureat ensam rabat")
 collect_profiles()
 
-# Close the browser
 driver.quit()
