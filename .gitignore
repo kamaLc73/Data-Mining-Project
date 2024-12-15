@@ -2,10 +2,7 @@
 *.env
 
 # Ignore Excel and PDF files
-# *.xlsx
 *.pdf
-*.txt
-# *.csv
 
 # Ignore any compiled Python files
 __pycache__/
@@ -14,5 +11,4 @@ __pycache__/
 env/
 
 # NoteBooks
-# *.ipynb
 *.py

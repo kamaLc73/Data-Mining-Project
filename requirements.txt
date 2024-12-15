@@ -1,0 +1,7 @@
+pwp==0.2.1
+python-dotenv==1.0.1
+PyYAML==5.1
+selenium
+pandas
+numpy
+beautifulsoup4
