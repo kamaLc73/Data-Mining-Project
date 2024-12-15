@@ -1,4 +1,5 @@
-### Add .env file you set values for the variables :
-LINKEDIN_USERNAME= "****"
+### Add .env file and you set values for the variables :
 
-LINKEDIN_PASSWORD= "****"
+LINKEDIN_USERNAME= " **** "
+
+LINKEDIN_PASSWORD= " **** "
