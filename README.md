@@ -1,7 +1,3 @@
-Based on the information extracted and inspiration from the provided `README`, here's a new `README.md` tailored for your project:
-
----
-
 # LinkedIn Data Extraction and Analysis
 
 ## Description
