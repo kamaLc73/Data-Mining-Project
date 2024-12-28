@@ -24,8 +24,8 @@ This project automates the collection and analysis of LinkedIn profile data, foc
 
 1. Clone the repository:
    ```bash
-   git clone <repository_url>
-   cd <repository_name>
+   git clone https://github.com/kamaLc73/Data-Mining-Project.git
+   cd Data-Mining-Project
    ```
 
 2. Install dependencies:
